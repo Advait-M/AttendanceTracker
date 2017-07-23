@@ -1,6 +1,3 @@
-/**
- * Created by leon on 7/8/2017.
- */
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -18,6 +15,8 @@ import java.util.Map;
 public class Driver implements IDriver {
     // Channel is the parent object
     private String channel = "https://clubattendancesjam.firebaseio.com/"; // Channel Name defaults to this if nothing is set
+    private String DefaultChannel = "https://clubattendancesjam.firebaseio.com/"; // Channel Name defaults to this if nothing is set
+
     private String key = "";//"AIzaSyCKseiiX1YCqopiL-gcMrWlxXVF2fLxqQo";
     private final static String QUATA = "\""; // Escaped Quotation Mark
 
@@ -39,35 +38,36 @@ public class Driver implements IDriver {
             data = data.substring(0, data.length() - 1);
             String node = data + "}";
             HttpClient httpclient = new DefaultHttpClient();
-//            node="{\"clubattendancesjam\":{\"alanisawesome\": {\"name\": \"Alan Leon\",\"birthday\": \"June 21, 1912\"}}}";//"\"Leon123\":{"+node+"}";
             HttpPut httppost = new HttpPut(getChannelUrl()); // Use PUT prevents key generation for each as a parent
             StringEntity entity = new StringEntity(node);
             httppost.setEntity(entity);
             httppost.setHeader("Accept", "application/json");
             httppost.setHeader("Content-type", "application/json");
             HttpResponse response = httpclient.execute(httppost);
-            if (response.getStatusLine().getStatusCode() == 200)
-                return true;
-            else
-                return false;
+            this.resetChannel();
+            return response.getStatusLine().getStatusCode() == 200;
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
         }
     }
 
-    public Reader read(String uri) {
+
+    public Reader read(String... uri) {
+        this.setChannel(uri);
         try {
             StringBuffer sb = new StringBuffer();
             sb.append(channel); //Reads from a channel
-            sb.append("/");
-            sb.append(uri);
+//            sb.append("/");
+//            sb.append(uri);
             sb.append(".json");
             addKey(sb);
             String url = sb.toString();
+            this.resetChannel();
             return getResultReader(url);
         } catch (Exception ex) {
             ex.printStackTrace();
+            this.resetChannel();
             return null;
         }
     }
@@ -84,10 +84,8 @@ public class Driver implements IDriver {
             HttpDelete delete = new HttpDelete(url);
             HttpClient httpclient = new DefaultHttpClient();
             HttpResponse response = httpclient.execute(delete);
-            if (response.getStatusLine().getStatusCode() == 200)
-                return true;
-            else
-                return false;
+            this.resetChannel();
+            return response.getStatusLine().getStatusCode() == 200;
         } catch (Exception ex) {
             ex.printStackTrace();
             return false;
@@ -120,10 +118,21 @@ public class Driver implements IDriver {
         return channel;
     }
 
-    public void setChannel(String channel) {
-        this.channel = channel;
+    public void setChannel(String... channel) {
+        if (channel.length==0){
+            return;
+        }
+        String finalLocation = "";
+        for (String location :
+                channel) {
+            finalLocation += location + "/";
+        }
+        this.channel = this.channel + finalLocation;
     }
 
+    public void resetChannel() {
+        this.channel = DefaultChannel;
+    }
     public String getKey() {
         return key;
     }
