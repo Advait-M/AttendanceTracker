@@ -16,14 +16,6 @@
         </constraints>
         <properties/>
       </component>
-      <component id="a1af9" class="javax.swing.JList" binding="list1" default-binding="true">
-        <constraints>
-          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="6" hsize-policy="2" anchor="0" fill="3" indent="0" use-parent-layout="false">
-            <preferred-size width="150" height="50"/>
-          </grid>
-        </constraints>
-        <properties/>
-      </component>
       <component id="abd76" class="javax.swing.JTextArea" binding="textArea1" default-binding="true">
         <constraints>
           <grid row="3" column="0" row-span="1" col-span="3" vsize-policy="6" hsize-policy="6" anchor="0" fill="3" indent="0" use-parent-layout="false">
@@ -32,12 +24,12 @@
         </constraints>
         <properties/>
       </component>
-      <component id="3952" class="javax.swing.JButton" binding="button1" default-binding="true">
+      <component id="3952" class="javax.swing.JButton" binding="enterButton">
         <constraints>
           <grid row="0" column="1" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Button"/>
+          <text value="Enter"/>
         </properties>
       </component>
       <component id="f10b8" class="javax.swing.JButton" binding="button2" default-binding="true">
@@ -48,14 +40,27 @@
           <text value="Button"/>
         </properties>
       </component>
-      <component id="1e19c" class="javax.swing.JButton" binding="button3" default-binding="true">
+      <component id="1e19c" class="javax.swing.JButton" binding="editButton">
         <constraints>
           <grid row="2" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Button"/>
+          <text value="Edit User"/>
         </properties>
       </component>
+      <scrollpane id="da6c7">
+        <constraints>
+          <grid row="1" column="0" row-span="1" col-span="3" vsize-policy="7" hsize-policy="7" anchor="0" fill="3" indent="0" use-parent-layout="false"/>
+        </constraints>
+        <properties/>
+        <border type="none"/>
+        <children>
+          <component id="a1af9" class="javax.swing.JList" binding="list1" default-binding="true">
+            <constraints/>
+            <properties/>
+          </component>
+        </children>
+      </scrollpane>
     </children>
   </grid>
 </form>
