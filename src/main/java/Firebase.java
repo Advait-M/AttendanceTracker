@@ -42,27 +42,26 @@ public class Firebase {
         return element.toString().equals("null") ? null : element.getAsJsonObject().keySet();
     }
 
-    public boolean addMeetingDay(String number, String club) {
-        Set<String> allStudents = getAllStudents();
-        if (allStudents == null) {
-            return createStudent(number, club);
-        } else if (!allStudents.contains(number)) {
-            return createStudent(number, club);
-        }
+    protected boolean SetMeetingDay(String number, String club){
         Map<String, String> data = new HashMap<String, String>();
+        // Reads data and parse as JSON
         Reader read = driver.read(number, club);
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
         System.out.println("JsonArray Contents");
+        if (element.toString().equals("null")){
+            return createStudent(number,club);
+        }
         Set<Map.Entry<String, JsonElement>> entries = element.getAsJsonObject().entrySet(); //will return members of your object
-        String MaxKey = "Meeting" + (entries.size());
-        JsonElement MaxValue = null;
+        String MaxKey = "Meeting" + (entries.size()); // Sets current meeting day that is in the database
+        JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
             JsonElement value = entry.getValue();
             System.out.println(entry.getKey() + "~>" + entry.getValue());
             data.put(key, value.toString().substring(1, value.toString().length() - 1));
             if (key.equals(MaxKey)) {
+                // Assigns max value which is date
                 MaxValue = value;
             }
         }
@@ -72,18 +71,37 @@ public class Firebase {
         }
         MaxValueString = MaxValue.getAsString().split(" ")[0];
         String date = getDate().split(" ")[0];
+        // Checks if max value is today if not then signs user in
         if (!(MaxValueString.equals(date))) {
-            // not signed in today
+            // Sign user in for  today
             data.put("Meeting" + (entries.size() + 1), getDate());
             driver.setChannel(number, club);
             return driver.write(data);
         }
         return true;
+
     }
 
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public boolean addMeetingDay(String number, String club) {
+        Set<String> allStudents = getAllStudents();
+        if (allStudents == null) {
+            return createStudent(number, club)==createStudent("000000000", club);
+        } else if (!allStudents.contains(number)) {
+            return createStudent(number, club);
+        }
+        return SetMeetingDay(number,club)==SetMeetingDay("000000000",club);
+
+    }
+
+    public static void main(String[] args)  {
         Firebase firebase = new Firebase();
-        System.out.println(firebase.addMeetingDay("741852936", "science"));
+        firebase.addMeetingDay("741852936", "science");
+        firebase.addMeetingDay("741852936", "computer-science");
+        firebase.addMeetingDay("641852934", "science");
+        firebase.addMeetingDay("641852934", "computer-science");
+        firebase.addMeetingDay("641852934", "mathletes");
+
+
 
 
     }
