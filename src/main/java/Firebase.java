@@ -33,6 +33,7 @@ public class Firebase {
         Map<String, String> data = new HashMap<String, String>();
         data.put("Meeting1", getDate());
         return driver.write(data);
+
     }
 
     public Set<String> getAllStudents() {
@@ -87,7 +88,7 @@ public class Firebase {
         if (allStudents == null) {
             return createStudent(number, club)==createStudent("000000000", club);
         } else if (!allStudents.contains(number)) {
-            return createStudent(number, club);
+            return createStudent(number, club)==SetMeetingDay("000000000", club);
         }
         return SetMeetingDay(number,club)==SetMeetingDay("000000000",club);
 
@@ -95,6 +96,12 @@ public class Firebase {
 
     public static void main(String[] args)  {
         Firebase firebase = new Firebase();
+        Random r = new Random();
+        String[] clubs = new String[] {"Art Club Ideas","Sculpture Club","Photography Club","Art History Club","Drama Club Ideas ","Shakespeare Club","Classics Club","Monologue Club","Comedy Sportz Club","Improv Club","Film Club Ideas","Foreign Film Club","Screenwriting Club","Directing Club","48-Hour Film Festival Club","Science Club Ideas","Future Scientists Club","Marine Biology Club","Future Medical Professionals Club","Math Club Ideas","Math Homework Club","Pi Club","Literature Club Ideas","Literature Magazine Club","Creative Writing Club","Book Club","Foreign Book Club","History Club Ideas","Ancient History Club","Language Club Ideas","Anime Club","Chess Club","Video Games Club","Skiing Club","Religion Club","Adventure Club","Charity Club Ideas","Save Endangered Species Club"};
+        for (int i = 0; i < 10; i++) {
+            firebase.addMeetingDay(String.valueOf(r.nextInt(900000000)+100000000),clubs[r.nextInt(clubs.length)].replace(" ","-"));
+
+        }
         firebase.addMeetingDay("741852936", "science");
         firebase.addMeetingDay("741852936", "computer-science");
         firebase.addMeetingDay("641852934", "science");
