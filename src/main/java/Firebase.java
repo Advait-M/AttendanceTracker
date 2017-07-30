@@ -19,34 +19,32 @@ public class Firebase {
     public Firebase() {
         this.driver = new Driver();
         this.dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+        this.driver.setKey("INSERT_KEY"); // Set key;
     }
 
     private String getDate() {
         return dateFormat.format(new Date().getTime());
     }
 
-    //    private String incrementMeeting(String Meeting){
-//        return "Meeting" + (Integer.parseInt(Meeting.substring(Meeting.indexOf('g')+1)) + 1);
-//    }
     public boolean createStudent(String number, String club) {
-        driver.setChannel(number, club);
+        this.driver.setChannel(number, club);
         Map<String, String> data = new HashMap<String, String>();
-        data.put("Meeting1", getDate());
-        return driver.write(data);
+        data.put("meeting1", getDate());
+        return this.driver.write(data);
 
     }
 
     public Set<String> getAllStudents() {
-        driver.setChannel();
+        this.driver.setChannel();
         JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(driver.read());
+        JsonElement element = parser.parse(this.driver.read());
         return element.toString().equals("null") ? null : element.getAsJsonObject().keySet();
     }
 
     protected boolean SetMeetingDay(String number, String club){
         Map<String, String> data = new HashMap<String, String>();
         // Reads data and parse as JSON
-        Reader read = driver.read(number, club);
+        Reader read = this.driver.read(number, club);
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
         System.out.println("JsonArray Contents");
@@ -54,13 +52,13 @@ public class Firebase {
             return createStudent(number,club);
         }
         Set<Map.Entry<String, JsonElement>> entries = element.getAsJsonObject().entrySet(); //will return members of your object
-        String MaxKey = "Meeting" + (entries.size()); // Sets current meeting day that is in the database
+        String MaxKey = "meeting" + (entries.size()); // Sets current meeting day that is in the database
         JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
             JsonElement value = entry.getValue();
             System.out.println(entry.getKey() + "~>" + entry.getValue());
-            data.put(key, value.toString().substring(1, value.toString().length() - 1));
+            data.put(key.toLowerCase(), value.toString().substring(1, value.toString().length() - 1).toLowerCase());
             if (key.equals(MaxKey)) {
                 // Assigns max value which is date
                 MaxValue = value;
@@ -76,8 +74,8 @@ public class Firebase {
         if (!(MaxValueString.equals(date))) {
             // Sign user in for  today
             data.put("Meeting" + (entries.size() + 1), getDate());
-            driver.setChannel(number, club);
-            return driver.write(data);
+            this.driver.setChannel(number, club);
+            return this.driver.write(data);
         }
         return true;
 
@@ -96,6 +94,7 @@ public class Firebase {
 
     public static void main(String[] args)  {
         Firebase firebase = new Firebase();
+        
         Random r = new Random();
         String[] clubs = new String[] {"Art Club Ideas","Sculpture Club","Photography Club","Art History Club","Drama Club Ideas ","Shakespeare Club","Classics Club","Monologue Club","Comedy Sportz Club","Improv Club","Film Club Ideas","Foreign Film Club","Screenwriting Club","Directing Club","48-Hour Film Festival Club","Science Club Ideas","Future Scientists Club","Marine Biology Club","Future Medical Professionals Club","Math Club Ideas","Math Homework Club","Pi Club","Literature Club Ideas","Literature Magazine Club","Creative Writing Club","Book Club","Foreign Book Club","History Club Ideas","Ancient History Club","Language Club Ideas","Anime Club","Chess Club","Video Games Club","Skiing Club","Religion Club","Adventure Club","Charity Club Ideas","Save Endangered Species Club"};
         for (int i = 0; i < 10; i++) {

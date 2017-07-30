@@ -17,7 +17,7 @@ public class Driver implements IDriver {
     private String channel = "https://clubattendancesjam.firebaseio.com/"; // Channel Name defaults to this if nothing is set
     private String DefaultChannel = "https://clubattendancesjam.firebaseio.com/"; // Channel Name defaults to this if nothing is set
 
-    private String key = "";//"AIzaSyCKseiiX1YCqopiL-gcMrWlxXVF2fLxqQo";
+    private String key = "";
     private final static String QUATA = "\""; // Escaped Quotation Mark
 
     public boolean write(Map<String, String> map) {
@@ -102,7 +102,7 @@ public class Driver implements IDriver {
 
     private void addKey(StringBuffer sb) {
         if (key != null) {
-            sb.append("?key=");
+            sb.append("?auth=");
             sb.append(key);
         }
     }
@@ -127,7 +127,7 @@ public class Driver implements IDriver {
                 channel) {
             finalLocation += location + "/";
         }
-        this.channel = this.channel + finalLocation;
+        this.channel = this.channel.toLowerCase() + finalLocation.toLowerCase();
     }
 
     public void resetChannel() {
