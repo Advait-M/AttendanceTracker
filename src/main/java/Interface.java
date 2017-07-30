@@ -1,7 +1,9 @@
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import com.alee.laf.WebLookAndFeel;
 
 /**
  * Created by advai on 7/8/2017.
@@ -27,13 +29,23 @@ public class Interface {
     }
 
     public static void main(String[] args) {
-        JFrame frame = new JFrame("Interface");
-        Interface ui = new Interface();
-        ui.list1.setModel(new DefaultListModel());
-        frame.setContentPane(ui.mainPane);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.pack();
-        frame.setVisible(true);
+        // You should work with UI (including installing L&F) inside Event Dispatch Thread (EDT)
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // Install WebLaF as application L&F
+                WebLookAndFeel.install();
+
+                // Create you Swing application here
+                JFrame frame = new JFrame("Interface");
+                Interface ui = new Interface();
+                ui.list1.setModel(new DefaultListModel());
+                frame.setContentPane(ui.mainPane);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+            }
+        });
+
     }
 
     {

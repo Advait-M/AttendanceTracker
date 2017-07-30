@@ -7,6 +7,9 @@ import sun.util.calendar.BaseCalendar;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.StringWriter;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.util.*;
 import java.text.SimpleDateFormat;
@@ -19,7 +22,19 @@ public class Firebase {
     public Firebase() {
         this.driver = new Driver();
         this.dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
-        this.driver.setKey("INSERT_KEY"); // Set key;
+        String key = "";
+        try {
+            key = readFile("key.txt", Charset.defaultCharset());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        this.driver.setKey(key); // Set key;
+    }
+
+    static String readFile(String path, Charset encoding) throws IOException
+    {
+        byte[] encoded = Files.readAllBytes(Paths.get(path));
+        return new String(encoded, encoding);
     }
 
     private String getDate() {
