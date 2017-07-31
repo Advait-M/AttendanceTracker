@@ -20,22 +20,55 @@ public class Interface {
     public Interface() {
         mainPane.setPreferredSize(new Dimension(800, 800));
         textField1.setPreferredSize(new Dimension(600, 30));
+        final Firebase fb = new Firebase();
+        //Add hacky console debugging interface to confuse user
         enterButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 System.out.println(textField1.getText());
-                ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
+                String number = textField1.getText();
+                if (isInteger(number)) {
+                    fb.addMeetingDay(number, "interface-club");
+                    ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
+                } else {
+                    JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
+                }
+
+
             }
         });
     }
 
+    public static boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static void main(String[] args) {
-        // You should work with UI (including installing L&F) inside Event Dispatch Thread (EDT)
+        // UI work inside Event Dispatch Thread (EDT) since it is best practice
         SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                // Install WebLaF as application L&F
+                // Install WebL&F as application L&F
                 WebLookAndFeel.install();
 
-                // Create you Swing application here
                 JFrame frame = new JFrame("Interface");
                 Interface ui = new Interface();
                 ui.list1.setModel(new DefaultListModel());
