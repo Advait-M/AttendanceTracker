@@ -44,7 +44,7 @@ public class Firebase {
     public boolean createStudent(String number, String club) {
         this.driver.setChannel(number, club);
         Map<String, String> data = new HashMap<String, String>();
-        data.put("meeting1", getDate());
+        data.put("Meeting1", getDate());
         return this.driver.write(data);
 
     }
@@ -67,7 +67,7 @@ public class Firebase {
             return createStudent(number,club);
         }
         Set<Map.Entry<String, JsonElement>> entries = element.getAsJsonObject().entrySet(); //will return members of your object
-        String MaxKey = "meeting" + (entries.size()); // Sets current meeting day that is in the database
+        String MaxKey = "Meeting" + (entries.size()); // Sets current meeting day that is in the database
         JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
