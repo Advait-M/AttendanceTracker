@@ -1,4 +1,3 @@
-
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
@@ -6,8 +5,7 @@ import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import java.io.InputStreamReader;
-import java.io.Reader;
+import java.io.*;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.Map;
@@ -15,7 +13,6 @@ import java.util.Map;
 public class Driver implements IDriver {
     // Channel is the parent object
     private String channel = "https://clubattendancesjam.firebaseio.com/"; // Channel Name defaults to this if nothing is set
-    private String DefaultChannel = "https://clubattendancesjam.firebaseio.com/"; // Channel Name defaults to this if nothing is set
 
     private String key = "";
     private final static String QUATA = "\""; // Escaped Quotation Mark
@@ -92,7 +89,7 @@ public class Driver implements IDriver {
         }
     }
 
-    public String getChannelUrl() {
+    private String getChannelUrl() {
         StringBuffer sb = new StringBuffer();
         sb.append(channel);
         sb.append(".json");
@@ -107,11 +104,31 @@ public class Driver implements IDriver {
         }
     }
 
-    public Reader getResultReader(String resource) throws Exception {
+    private Reader getResultReader(String resource) throws Exception {
         URL url = new URL(resource);
         URLConnection connection = url.openConnection();
         connection.setConnectTimeout(30000);
         return new InputStreamReader(connection.getInputStream());
+    }
+
+    public boolean channelExists() {
+        try {
+            String content;
+            StringBuilder sb = new StringBuilder();
+            Reader isr = getResultReader(getChannelUrl());
+            BufferedReader br = new BufferedReader(isr);
+            while ((content = br.readLine()) != null) {
+                sb.append(content);
+            }
+            System.out.println("\nSB \""+sb.toString()+"\"\n");
+            if (!sb.toString().equalsIgnoreCase("null")){
+                System.out.println("==>PASS");
+                return true;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
     }
 
     public String getChannel() {
@@ -119,7 +136,7 @@ public class Driver implements IDriver {
     }
 
     public void setChannel(String... channel) {
-        if (channel.length==0){
+        if (channel.length == 0) {
             return;
         }
         String finalLocation = "";
@@ -130,9 +147,11 @@ public class Driver implements IDriver {
         this.channel = this.channel.toLowerCase() + finalLocation.toLowerCase();
     }
 
-    public void resetChannel() {
-        this.channel = DefaultChannel;
+    private void resetChannel() {
+        String defaultChannel = "https://clubattendancesjam.firebaseio.com/";
+        this.channel = defaultChannel;
     }
+
     public String getKey() {
         return key;
     }

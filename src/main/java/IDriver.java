@@ -21,6 +21,8 @@ public interface IDriver {
 
     void setChannel(String... channel);
 
+    boolean channelExists();
+
     void setKey(String key);
 
 }
