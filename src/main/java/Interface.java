@@ -32,7 +32,6 @@ public class Interface {
         textField1.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
-                System.out.println("EDITING");
                 if (textField1.getText().length() == 9) {
                     {
                         System.out.println(textField1.getText());
@@ -52,7 +51,7 @@ public class Interface {
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-                System.out.println("DELETE");
+
             }
 
             @Override
