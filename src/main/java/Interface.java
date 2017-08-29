@@ -1,5 +1,7 @@
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,21 +26,54 @@ public class Interface {
     public Interface() {
         mainPane.setPreferredSize(new Dimension(800, 800));
         textField1.setPreferredSize(new Dimension(600, 30));
+        list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final Firebase fb = new Firebase();
         //Add hacky console debugging interface to confuse user
-        enterButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                System.out.println(textField1.getText());
-                String number = textField1.getText();
-                if (isInteger(number)) {
-                    fb.addMeetingDay(number, configDict.get("club"));
-                    ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
-                } else {
-                    JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
+        textField1.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                System.out.println("EDITING");
+                if (textField1.getText().length() == 9) {
+                    {
+                        System.out.println(textField1.getText());
+                        String number = textField1.getText();
+                        SwingUtilities.invokeLater(() -> textField1.setText(null));
+                        if (isInteger(number)) {
+                            fb.addMeetingDay(number, configDict.get("club"));
+                            if (!((DefaultListModel) list1.getModel()).contains(number)) {
+                                ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
+                            }
+                        } else {
+                            JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
+                        }
+                    }
                 }
+            }
 
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                System.out.println("DELETE");
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                System.out.println("INSERTING");
 
             }
+        });
+        enterButton.addActionListener(e -> {
+            System.out.println(textField1.getText());
+            String number = textField1.getText();
+            textField1.setText(null);
+            if (isInteger(number)) {
+                fb.addMeetingDay(number, configDict.get("club"));
+                if (!((DefaultListModel) list1.getModel()).contains(number)) {
+                    ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
+            }
+
         });
     }
 
@@ -120,39 +155,39 @@ public class Interface {
             } else {
                 throw new Error("User cancelled program.");
             }
-
-            try {
-                FileInputStream fileIn = new FileInputStream("config.ser");
-                ObjectInputStream in = new ObjectInputStream(fileIn);
-                configDict = (HashMap<String, String>) in.readObject();
-                in.close();
-                fileIn.close();
-                System.out.println("HEHREHE");
-                for (String key : configDict.keySet()) {
-                    System.out.println(key + ":" + configDict.get(key));
-                }
-            } catch (IOException i) {
-                i.printStackTrace();
-            } catch (ClassNotFoundException c) {
-                c.printStackTrace();
-            }
-
-            // UI work inside Event Dispatch Thread (EDT) since it is best practice
-            SwingUtilities.invokeLater(new Runnable() {
-                public void run() {
-                    // Install WebL&F as application L&F
-                    WebLookAndFeel.install();
-
-                    JFrame frame = new JFrame("Interface");
-                    Interface ui = new Interface();
-                    ui.list1.setModel(new DefaultListModel());
-                    frame.setContentPane(ui.mainPane);
-                    frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-                    frame.pack();
-                    frame.setVisible(true);
-                }
-            });
-
         }
+        try {
+            FileInputStream fileIn = new FileInputStream("config.ser");
+            ObjectInputStream in = new ObjectInputStream(fileIn);
+            configDict = (HashMap<String, String>) in.readObject();
+            in.close();
+            fileIn.close();
+            System.out.println("HEHREHE");
+            for (String key : configDict.keySet()) {
+                System.out.println(key + ":" + configDict.get(key));
+            }
+        } catch (IOException i) {
+            i.printStackTrace();
+        } catch (ClassNotFoundException c) {
+            c.printStackTrace();
+        }
+
+        // UI work inside Event Dispatch Thread (EDT) since it is best practice
+        SwingUtilities.invokeLater(new Runnable() {
+            public void run() {
+                // Install WebL&F as application L&F
+                WebLookAndFeel.install();
+
+                JFrame frame = new JFrame("Interface");
+                Interface ui = new Interface();
+                ui.list1.setModel(new DefaultListModel());
+                frame.setContentPane(ui.mainPane);
+                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.pack();
+                frame.setVisible(true);
+            }
+        });
+
     }
 }
+
