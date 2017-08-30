@@ -17,6 +17,58 @@ public class Driver implements IDriver {
     private String key = "";
     private final static String QUATA = "\""; // Escaped Quotation Mark
 
+    public boolean writeA(String[] all_data) {
+        try {
+            StringBuffer sb = new StringBuffer();
+            sb.append("[");
+            for (String i : all_data) {
+                sb.append(QUATA+i+QUATA+",");
+            }
+
+            String data = sb.toString();
+            data = data.substring(0, data.length() - 1);
+            String node = data + "]";
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPut httppost = new HttpPut(getChannelUrl()); // Use PUT prevents key generation for each as a parent
+            StringEntity entity = new StringEntity(node);
+            httppost.setEntity(entity);
+            httppost.setHeader("Accept", "application/json");
+            httppost.setHeader("Content-type", "application/json");
+            HttpResponse response = httpclient.execute(httppost);
+            this.resetChannel();
+            return response.getStatusLine().getStatusCode() == 200;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public boolean writeA(String key,String[] all_data) {
+        try {
+            StringBuffer sb = new StringBuffer();
+            sb.append("{"+QUATA+key+QUATA+":[");
+            for (String i : all_data) {
+                sb.append(QUATA+i+QUATA+",");
+            }
+
+            String data = sb.toString();
+            data = data.substring(0, data.length() - 1);
+            String node = data + "]}";
+            HttpClient httpclient = new DefaultHttpClient();
+            HttpPut httppost = new HttpPut(getChannelUrl()); // Use PUT prevents key generation for each as a parent
+            StringEntity entity = new StringEntity(node);
+            httppost.setEntity(entity);
+            httppost.setHeader("Accept", "application/json");
+            httppost.setHeader("Content-type", "application/json");
+            HttpResponse response = httpclient.execute(httppost);
+            this.resetChannel();
+            return response.getStatusLine().getStatusCode() == 200;
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            return false;
+        }
+    }
     public boolean write(Map<String, String> map) {
         try {
             StringBuffer sb = new StringBuffer();
@@ -48,7 +100,6 @@ public class Driver implements IDriver {
             return false;
         }
     }
-
 
     public Reader read(String... uri) {
         this.setChannel(uri);
@@ -120,8 +171,8 @@ public class Driver implements IDriver {
             while ((content = br.readLine()) != null) {
                 sb.append(content);
             }
-            System.out.println("\nSB \""+sb.toString()+"\"\n");
-            if (!sb.toString().equalsIgnoreCase("null")){
+            System.out.println("\nSB \"" + sb.toString() + "\"\n");
+            if (!sb.toString().equalsIgnoreCase("null")) {
                 System.out.println("==>PASS");
                 return true;
             }

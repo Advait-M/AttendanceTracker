@@ -1,6 +1,3 @@
-
-import com.google.gson.JsonArray;
-
 import java.io.Reader;
 import java.util.Map;
 
@@ -12,6 +9,10 @@ import java.util.Map;
  *
  */
 public interface IDriver {
+
+    boolean writeA(String[] all_data);
+
+    boolean writeA(String key, String[] all_data);
 
     boolean write(Map<String, String> map);
 

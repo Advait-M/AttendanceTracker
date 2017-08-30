@@ -1,13 +1,9 @@
 
 
 import com.google.gson.*;
-import com.google.gson.stream.JsonReader;
-import jdk.nashorn.internal.parser.JSONParser;
-import sun.util.calendar.BaseCalendar;
 
 import java.io.IOException;
 import java.io.Reader;
-import java.io.StringWriter;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -17,23 +13,23 @@ import java.text.SimpleDateFormat;
 
 
 public class Firebase {
-    IDriver driver;
-    DateFormat dateFormat;
+    private IDriver driver;
+    private DateFormat dateFormat;
 
     public Firebase() {
         this.driver = new Driver();
         this.dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         String key = "";
         try {
-            key = readFile("key.txt", Charset.defaultCharset());
+            key = readFile(Charset.defaultCharset());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.driver.setKey(key); // Set key;
+        this.driver.setKey(key);
     }
 
-    static String readFile(String path, Charset encoding) throws IOException {
-        byte[] encoded = Files.readAllBytes(Paths.get(path));
+    private static String readFile(Charset encoding) throws IOException {
+        byte[] encoded = Files.readAllBytes(Paths.get("key.txt"));
         return new String(encoded, encoding);
     }
 
@@ -42,21 +38,51 @@ public class Firebase {
     }
 
     public boolean createStudent(String number, String club) {
+        addStudentToList(number);
         this.driver.setChannel(number, club);
-        Map<String, String> data = new HashMap<String, String>();
+        Map<String, String> data = new HashMap<>();
         data.put("meeting1", getDate());
         return this.driver.write(data);
 
     }
 
-    public Set<String> getAllStudents() {
-        this.driver.setChannel();
+    private void addStudentToList(String number) {
+        HashSet<String> all_students = new HashSet<>();
+        all_students.add(number);
+        this.driver.setChannel("all_students");
+        Reader read = this.driver.read();
         JsonParser parser = new JsonParser();
-        JsonElement element = parser.parse(this.driver.read());
-        return element.toString().equals("null") ? null : element.getAsJsonObject().keySet();
+        JsonElement element = parser.parse(read);
+        if (element.toString().equalsIgnoreCase("null")) {
+            this.driver.writeA("all_students", all_students.toArray(new String[0]));
+        } else {
+            for (JsonElement jsonElement : element.getAsJsonArray()) {
+                all_students.add(jsonElement.getAsString());
+            }
+            System.out.println("in else");
+            this.driver.setChannel("all_students");
+            System.out.println(this.driver.writeA(all_students.toArray(new String[0])));
+        }
+
     }
 
-    protected boolean SetMeetingDay(String number, String club) {
+
+    private ArrayList<String> getAllStudents() {
+        this.driver.setChannel("all_students");
+        JsonParser parser = new JsonParser();
+        JsonElement element = parser.parse(this.driver.read());
+        if (!element.toString().equals("null")) {
+            ArrayList<String> temp = new ArrayList<>();
+            for (JsonElement e : element.getAsJsonArray()) {
+                temp.add(e.getAsString());
+            }
+            return temp;
+        } else {
+            return null;
+        }
+    }
+
+    private boolean SetMeetingDay(String number, String club) {
         Map<String, String> data = new HashMap<String, String>();
         // Reads data and parse as JSON
         Reader read = this.driver.read(number, club);
@@ -95,8 +121,8 @@ public class Firebase {
         return true;
     }
 
-    public boolean addMeetingDay(String number, String club) {
-        Set<String> allStudents = getAllStudents();
+    boolean addMeetingDay(String number, String club) {
+        ArrayList<String> allStudents = getAllStudents();
         if (allStudents == null) {
             return createStudent(number, club) == createStudent("club_master", club);
         } else if (!allStudents.contains(number)) {
@@ -107,8 +133,8 @@ public class Firebase {
     }
 
     private boolean SetUserPaid(String number, String club) {
-        Map<String, String> data = new HashMap<String, String>();
-        data.put("paid", getDate().toString());
+        Map<String, String> data = new HashMap<>();
+        data.put("paid", getDate());
         if (!getAllStudents().contains(number)) {
             return false;
         }
@@ -126,7 +152,7 @@ public class Firebase {
         return this.driver.write(data);
     }
 
-    public boolean SetPaid(String number, String club) {
+    boolean SetPaid(String number, String club) {
         return SetUserPaid(number, club) == SetUserPaid("club_master", club);
     }
 
@@ -134,6 +160,7 @@ public class Firebase {
         Firebase firebase = new Firebase();
         firebase.addMeetingDay("641852934", "science");
         firebase.SetPaid("641852934", "science");
+        firebase.SetPaid("64sd1852934", "sscience");
 
 
 //        Random r = new Random();

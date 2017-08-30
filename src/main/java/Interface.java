@@ -13,7 +13,6 @@ public class Interface {
     private JPanel mainPane;
     private JTextField textField1;
     private JList list1;
-    private JTextArea textArea1;
     private JButton enterButton;
     private JButton clearButton;
     private JButton editButton;
@@ -62,7 +61,7 @@ public class Interface {
 
         });
         clearButton.addActionListener(e -> SwingUtilities.invokeLater(() -> textField1.setText(null)));
-        list1.addListSelectionListener(e -> edit_number.setText(list1.getSelectedValue().toString()));
+        list1.addListSelectionListener(e -> System.out.println(list1.getSelectedValue().toString()));
     }
 
     public static boolean isInteger(String str) {
