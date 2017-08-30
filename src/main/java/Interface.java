@@ -1,14 +1,10 @@
-
+import com.alee.laf.WebLookAndFeel;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.*;
 import java.util.HashMap;
-
-import com.alee.laf.WebLookAndFeel;
 
 /**
  * Created by advai on 7/8/2017.
@@ -19,13 +15,15 @@ public class Interface {
     private JList list1;
     private JTextArea textArea1;
     private JButton enterButton;
-    private JButton button2;
+    private JButton clearButton;
     private JButton editButton;
-    private static HashMap<String, String> configDict = new HashMap<String, String>();
+    private JLabel edit_number;
+    private static HashMap<String, String> configDict = new HashMap<>();
 
     public Interface() {
         mainPane.setPreferredSize(new Dimension(800, 800));
         textField1.setPreferredSize(new Dimension(600, 30));
+
         list1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         final Firebase fb = new Firebase();
         //Add hacky console debugging interface to confuse user
@@ -33,47 +31,38 @@ public class Interface {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (textField1.getText().length() == 9) {
-                    {
-                        System.out.println(textField1.getText());
-                        String number = textField1.getText();
-                        SwingUtilities.invokeLater(() -> textField1.setText(null));
-                        if (isInteger(number)) {
-                            fb.addMeetingDay(number, configDict.get("club"));
-                            if (!((DefaultListModel) list1.getModel()).contains(number)) {
-                                ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
-                            }
-                        } else {
-                            JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
-                        }
-                    }
+                    enterButton.doClick();
                 }
             }
 
             @Override
             public void removeUpdate(DocumentEvent e) {
-
             }
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                System.out.println("INSERTING");
-
             }
         });
         enterButton.addActionListener(e -> {
+
             System.out.println(textField1.getText());
             String number = textField1.getText();
-            textField1.setText(null);
             if (isInteger(number)) {
                 fb.addMeetingDay(number, configDict.get("club"));
                 if (!((DefaultListModel) list1.getModel()).contains(number)) {
                     ((DefaultListModel) list1.getModel()).add(0, textField1.getText());
+                    clearButton.doClick();
                 }
             } else {
                 JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
+                clearButton.doClick();
+
             }
 
+
         });
+        clearButton.addActionListener(e -> SwingUtilities.invokeLater(() -> textField1.setText(null)));
+        list1.addListSelectionListener(e -> edit_number.setText(list1.getSelectedValue().toString()));
     }
 
     public static boolean isInteger(String str) {
@@ -103,14 +92,9 @@ public class Interface {
     public static void main(String[] args) {
 
         String filePath = "config.ser";
-
-
-        String line;
-        BufferedReader reader = null;
-
         File f = new File("config.txt");
         try {
-            reader = new BufferedReader(new FileReader(filePath));
+            BufferedReader reader = new BufferedReader(new FileReader(filePath));
         } catch (FileNotFoundException e) {
             String name = JOptionPane.showInputDialog(
                     "What is your club's name?", null);
@@ -120,10 +104,10 @@ public class Interface {
             configDict.put("club", name);
             String[] values = {"No", "Yes"};
 
-            Object selectedPaid = JOptionPane.showInputDialog(null, "Does your club have a membership fee?", "Selection", JOptionPane.DEFAULT_OPTION, null, values, "0");
+            Object selectedPaid = JOptionPane.showInputDialog(null, "Does your club have a membership fee?", "Selection", JOptionPane.PLAIN_MESSAGE, null, values, "0");
             if (selectedPaid != null) {//null if the user cancels.
                 String isPaid = selectedPaid.toString();
-                if (isPaid == "Yes") {
+                if (isPaid.equalsIgnoreCase("Yes")) {
                     configDict.put("paid", "true");
                 } else {
                     configDict.put("paid", "false");
@@ -136,13 +120,15 @@ public class Interface {
                 } catch (FileNotFoundException e1) {
                     e1.printStackTrace();
                 }
-                ObjectOutputStream out = null;
+                ObjectOutputStream out;
 
                 try {
                     out = new ObjectOutputStream(fileOut);
                     out.writeObject(configDict);
                     out.close();
-                    fileOut.close();
+                    if (fileOut != null) {
+                        fileOut.close();
+                    }
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
@@ -165,10 +151,8 @@ public class Interface {
             for (String key : configDict.keySet()) {
                 System.out.println(key + ":" + configDict.get(key));
             }
-        } catch (IOException i) {
+        } catch (IOException | ClassNotFoundException i) {
             i.printStackTrace();
-        } catch (ClassNotFoundException c) {
-            c.printStackTrace();
         }
 
         // UI work inside Event Dispatch Thread (EDT) since it is best practice
@@ -181,12 +165,13 @@ public class Interface {
                 Interface ui = new Interface();
                 ui.list1.setModel(new DefaultListModel());
                 frame.setContentPane(ui.mainPane);
-                frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.pack();
                 frame.setVisible(true);
             }
         });
 
     }
+
 }
 

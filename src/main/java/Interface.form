@@ -32,12 +32,12 @@
           <text value="Enter"/>
         </properties>
       </component>
-      <component id="f10b8" class="javax.swing.JButton" binding="button2" default-binding="true">
+      <component id="f10b8" class="javax.swing.JButton" binding="clearButton">
         <constraints>
           <grid row="0" column="2" row-span="1" col-span="1" vsize-policy="0" hsize-policy="3" anchor="0" fill="1" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
-          <text value="Button"/>
+          <text value="Clear"/>
         </properties>
       </component>
       <component id="1e19c" class="javax.swing.JButton" binding="editButton">
