@@ -68,9 +68,11 @@ public class Firebase {
 
 
     private ArrayList<String> getAllStudents() {
+        this.driver.resetChannel();
         this.driver.setChannel("all_students");
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(this.driver.read());
+        System.out.println(element.toString());
         if (!element.toString().equals("null")) {
             ArrayList<String> temp = new ArrayList<>();
             for (JsonElement e : element.getAsJsonArray()) {
@@ -82,7 +84,7 @@ public class Firebase {
         }
     }
 
-    private boolean SetMeetingDay(String number, String club) {
+    private int SetMeetingDay(String number, String club) {
         Map<String, String> data = new HashMap<String, String>();
         // Reads data and parse as JSON
         Reader read = this.driver.read(number, club);
@@ -90,16 +92,30 @@ public class Firebase {
         JsonElement element = parser.parse(read);
 //        System.out.println("JsonArray Contents");
         if (element.toString().equals("null")) {
-            return createStudent(number, club);
+            boolean result = createStudent(number, club);
+            if (result) {
+                return 0;
+            }
+            else {
+                return 1;
+            }
         }
         Set<Map.Entry<String, JsonElement>> entries = element.getAsJsonObject().entrySet(); //will return members of your object
         String MaxKey = "meeting" + (entries.size()); // Sets current meeting day that is in the database
         JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
+            // TODO: replace with getPaid()
+            if (key.toLowerCase().equals("paid")) {
+                MaxKey = "meeting" + (entries.size()- 1);
+            }
+        }
+        for (Map.Entry<String, JsonElement> entry : entries) {
+            String key = entry.getKey();
             JsonElement value = entry.getValue();
 //            System.out.println(entry.getKey() + "~>" + entry.getValue());
             data.put(key.toLowerCase(), value.toString().substring(1, value.toString().length() - 1).toLowerCase());
+
             if (key.equals(MaxKey)) {
                 // Assigns max value which is date
                 MaxValue = value;
@@ -107,7 +123,7 @@ public class Firebase {
         }
         String MaxValueString;
         if (MaxValue == null) {
-            return false;
+            return 1;
         }
         MaxValueString = MaxValue.getAsString().split(" ")[0];
         String date = getDate().split(" ")[0];
@@ -116,23 +132,57 @@ public class Firebase {
             // Sign user in for  today
             data.put("meeting" + (entries.size() + 1), getDate());
             this.driver.setChannel(number, club);
-            return this.driver.write(data);
+            boolean result = this.driver.write(data);
+            if (result) {
+                return 0;
+            }
+            else {
+                return 1;
+            }
         }
-        return true;
+        else {
+            return 2;
+        }
     }
 
-    boolean addMeetingDay(String number, String club) {
+    int addMeetingDay(String number, String club) {
         ArrayList<String> allStudents = getAllStudents();
         if (allStudents == null) {
-            return createStudent(number, club) == createStudent("club_master", club);
+            boolean result = createStudent(number, club) == createStudent("club_master", club);
+            if (result) {
+                return 0;
+            }
+            else {
+                return 1;
+            }
         } else if (!allStudents.contains(number)) {
-            return createStudent(number, club) == SetMeetingDay("club_master", club);
+            boolean result = createStudent(number, club);
+            int result2 = SetMeetingDay("club_master", club);
+            if (result) {
+                return result2;
+            }
+            else {
+                return 1;
+            }
         }
-        return SetMeetingDay(number, club) == SetMeetingDay("club_master", club);
+        int result =  SetMeetingDay(number, club);
+        int result2 = SetMeetingDay("club_master", club);
+        if (result == 1 || result2 == 1) {
+            return 1;
+        }
+        if (result == 2 || result2 == 2) {
+            return 2;
+        }
+        return 0;
 
     }
 
-    private boolean SetUserPaid(String number, String club) {
+    boolean getPaid(String number, String club) {
+        this.driver.setChannel(number, club);
+        return false;
+    }
+
+    private boolean setUserPaid(String number, String club) {
         Map<String, String> data = new HashMap<>();
         data.put("paid", getDate());
         if (!getAllStudents().contains(number)) {
@@ -152,15 +202,15 @@ public class Firebase {
         return this.driver.write(data);
     }
 
-    boolean SetPaid(String number, String club) {
-        return SetUserPaid(number, club) == SetUserPaid("club_master", club);
+    boolean setPaid(String number, String club) {
+        return setUserPaid(number, club) == setUserPaid("club_master", club);
     }
 
     public static void main(String[] args) {
         Firebase firebase = new Firebase();
         firebase.addMeetingDay("641852934", "science");
-        firebase.SetPaid("641852934", "science");
-        firebase.SetPaid("64sd1852934", "sscience");
+        firebase.setPaid("641852934", "science");
+        firebase.setPaid("64sd1852934", "sscience");
 
 
 //        Random r = new Random();

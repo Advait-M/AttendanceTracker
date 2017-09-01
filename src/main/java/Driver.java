@@ -198,7 +198,7 @@ public class Driver implements IDriver {
         this.channel = this.channel.toLowerCase() + finalLocation.toLowerCase();
     }
 
-    private void resetChannel() {
+    public void resetChannel() {
         String defaultChannel = "https://clubattendancesjam.firebaseio.com/";
         this.channel = defaultChannel;
     }
