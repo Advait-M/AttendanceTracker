@@ -28,4 +28,6 @@ public interface IDriver {
 
     void setKey(String key);
 
+    public String getChannel();
+
 }

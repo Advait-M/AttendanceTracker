@@ -102,7 +102,7 @@ public class Driver implements IDriver {
     }
 
     public Reader read(String... uri) {
-        this.setChannel(uri);
+        //this.setChannel(uri);
         try {
             StringBuffer sb = new StringBuffer();
             sb.append(channel); //Reads from a channel
@@ -111,7 +111,7 @@ public class Driver implements IDriver {
             sb.append(".json");
             addKey(sb);
             String url = sb.toString();
-            this.resetChannel();
+            //this.resetChannel();
             return getResultReader(url);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -187,6 +187,7 @@ public class Driver implements IDriver {
     }
 
     public void setChannel(String... channel) {
+        this.resetChannel();
         if (channel.length == 0) {
             return;
         }
@@ -196,6 +197,8 @@ public class Driver implements IDriver {
             finalLocation += location + "/";
         }
         this.channel = this.channel.toLowerCase() + finalLocation.toLowerCase();
+        System.out.println("CHANNEL");
+        System.out.println(this.channel);
     }
 
     public void resetChannel() {

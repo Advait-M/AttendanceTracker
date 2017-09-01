@@ -79,7 +79,10 @@ public class Interface {
                             if (model.getValueAt(row, 1) == "Not Paid") {
                                 System.out.println("TRIGGERED");
                                 System.out.println((String) model.getValueAt(row, 0));
-                                System.out.println(fb.setPaid((String) model.getValueAt(row, 0), configDict.get("club")));
+                                new Thread (() -> {
+                                    System.out.println(fb.setPaid((String) model.getValueAt(row, 0), configDict.get("club")));
+                                    model.setValueAt("Paid", row, 1);
+                                }).start();
                             }
 //                            JFrame hello = new JFrame("POPUP");
 //                            hello.setSize(100,75);
@@ -280,7 +283,7 @@ public class Interface {
                     e1.printStackTrace();
                 }
 
-                System.out.printf("Serialized data is saved in config.ser");
+                System.out.println("Serialized data is saved in config.ser");
                 for (String key : configDict.keySet()) {
                     System.out.println(key + ":" + configDict.get(key));
                 }

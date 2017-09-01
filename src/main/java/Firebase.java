@@ -48,6 +48,7 @@ public class Firebase {
     private void addStudentToList(String number) {
         HashSet<String> all_students = new HashSet<>();
         all_students.add(number);
+        this.driver.resetChannel();
         this.driver.setChannel("all_students");
         Reader read = this.driver.read();
         JsonParser parser = new JsonParser();
@@ -59,6 +60,7 @@ public class Firebase {
                 all_students.add(jsonElement.getAsString());
             }
             System.out.println("in else");
+            this.driver.resetChannel();
             this.driver.setChannel("all_students");
             System.out.println(this.driver.writeA(all_students.toArray(new String[0])));
         }
@@ -69,9 +71,12 @@ public class Firebase {
     private ArrayList<String> getAllStudents() {
         this.driver.resetChannel();
         this.driver.setChannel("all_students");
+        System.out.println("Here");
+        System.out.println(this.driver.getChannel());
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(this.driver.read());
         System.out.println(element.toString());
+        System.out.println(this.driver.getChannel());
         if (!element.toString().equals("null")) {
             ArrayList<String> temp = new ArrayList<>();
             for (JsonElement e : element.getAsJsonArray()) {
@@ -85,13 +90,16 @@ public class Firebase {
 
     private int SetMeetingDay(String number, String club) {
         Map<String, String> data = new HashMap<String, String>();
+        this.driver.setChannel(number, club);
         // Reads data and parse as JSON
-        Reader read = this.driver.read(number, club);
+        Reader read = this.driver.read();
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
 //        System.out.println("JsonArray Contents");
         if (element.toString().equals("null")) {
             boolean result = createStudent(number, club);
+            System.out.println("HEWRE5");
+            System.out.println(result);
             if (result) {
                 return 0;
             }
@@ -100,15 +108,17 @@ public class Firebase {
             }
         }
         Set<Map.Entry<String, JsonElement>> entries = element.getAsJsonObject().entrySet(); //will return members of your object
-        String MaxKey = "meeting" + (entries.size()); // Sets current meeting day that is in the database
-        JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
-        for (Map.Entry<String, JsonElement> entry : entries) {
-            String key = entry.getKey();
-            // TODO: replace with getPaid()
-            if (key.toLowerCase().equals("paid")) {
-                MaxKey = "meeting" + (entries.size()- 1);
-            }
+        String MaxKey;
+        if (getPaid(number, club)) {
+            MaxKey = "meeting" + (entries.size()- 1);
         }
+        else {
+            MaxKey = "meeting" + (entries.size()); // Sets current meeting day that is in the database
+        }
+
+        JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
+        System.out.println("maxi1");
+        System.out.println(MaxKey);
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
             JsonElement value = entry.getValue();
@@ -122,6 +132,7 @@ public class Firebase {
         }
         String MaxValueString;
         if (MaxValue == null) {
+            System.out.println("RIP");
             return 1;
         }
         MaxValueString = MaxValue.getAsString().split(" ")[0];
@@ -132,6 +143,8 @@ public class Firebase {
             data.put("meeting" + (entries.size() + 1), getDate());
             this.driver.setChannel(number, club);
             boolean result = this.driver.write(data);
+            System.out.println("HEWRE2");
+            System.out.println(result);
             if (result) {
                 return 0;
             }
@@ -192,7 +205,8 @@ public class Firebase {
         if (!getAllStudents().contains(number)) {
             return false;
         }
-        Reader read = this.driver.read(number, club);
+        this.driver.setChannel(number, club);
+        Reader read = this.driver.read();
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
         Set<Map.Entry<String, JsonElement>> entries = element.getAsJsonObject().entrySet(); //will return members of your object
