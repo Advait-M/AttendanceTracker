@@ -159,35 +159,37 @@ public class Interface {
         System.out.println(textField1.getText());
         String number = textField1.getText();
         if (isInteger(number)) {
-            int ret = fb.addMeetingDay(number, configDict.get("club"));
-            System.out.println("STUFF");
-            System.out.println(ret);
-//            if (!((DefaultListModel) table1.getModel()).contains(number)) {
-//                ((DefaultListModel) table1.getModel()).add(0, textField1.getText());
-//            }
-            if (ret == 1) {
-                JOptionPane.showMessageDialog(null, "Invalid Firebase data or connection to Firebase. Please contact developers.");
-                throw new java.lang.Error("Terminated program due to invalid connection to Firebase or invalid data in Firebase.");
-            }
-            if (ret == 2) {
-                JOptionPane.showMessageDialog(null, "User is already signed in to " + configDict.get("club") + " today! Cannot sign in again.");
-            }
-            if (!checkTableExists(number) && ret != 2) {
-                DefaultTableModel model = (DefaultTableModel) table1.getModel();
-                if (configDict.get("paid").equals("true")) {
-                    boolean paid = fb.getPaid(number, configDict.get("club"));
-                    String paidStatus;
-                    if (paid) {
-                        paidStatus = "Paid";
-                    }
-                    else {
-                        paidStatus = "Not Paid";
-                    }
-                    model.insertRow(0, new Object[]{number, paidStatus});
-                } else {
-                    model.insertRow(0, new Object[]{number});
+            new Thread (() -> {
+                int ret = fb.addMeetingDay(number, configDict.get("club"));
+
+                System.out.println("STUFF");
+                System.out.println(ret);
+                //            if (!((DefaultListModel) table1.getModel()).contains(number)) {
+                //                ((DefaultListModel) table1.getModel()).add(0, textField1.getText());
+                //            }
+                if (ret == 1) {
+                    JOptionPane.showMessageDialog(null, "Invalid Firebase data or connection to Firebase. Please contact developers.");
+                    throw new java.lang.Error("Terminated program due to invalid connection to Firebase or invalid data in Firebase.");
                 }
-            }
+                if (ret == 2) {
+                    JOptionPane.showMessageDialog(null, "User is already signed in to " + configDict.get("club") + " today! Cannot sign in again.");
+                }
+                if (!checkTableExists(number) && ret != 2) {
+                    DefaultTableModel model = (DefaultTableModel) table1.getModel();
+                    if (configDict.get("paid").equals("true")) {
+                        boolean paid = fb.getPaid(number, configDict.get("club"));
+                        String paidStatus;
+                        if (paid) {
+                            paidStatus = "Paid";
+                        } else {
+                            paidStatus = "Not Paid";
+                        }
+                        model.insertRow(0, new Object[]{number, paidStatus});
+                    } else {
+                        model.insertRow(0, new Object[]{number});
+                    }
+                }
+            }).start();
         } else {
             JOptionPane.showMessageDialog(null, "Please enter a valid student number!");
 

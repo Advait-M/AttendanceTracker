@@ -141,7 +141,8 @@ public class Firebase {
             }
         }
         else {
-            return 2;
+            // TODO: CHANGE TO 2 - CURRENTLY BREAKS THREADING (Somehow threading calls this twice)
+            return 0;
         }
     }
 
@@ -170,7 +171,7 @@ public class Firebase {
         if (result == 1 || result2 == 1) {
             return 1;
         }
-        if (result == 2 || result2 == 2) {
+        if (result == 2) {
             return 2;
         }
         return 0;
