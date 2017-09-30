@@ -197,14 +197,7 @@ public class Interface {
         System.out.println(textField1.getText());
         String number = textField1.getText();
         if (isInteger(number)) {
-<<<<<<< HEAD
-            new Thread(() -> {
-=======
-            System.out.println("HEREE");
-//            queue.add(number);
-
             new Thread (() -> {
->>>>>>> refs/remotes/origin/better
                 int ret = fb.addMeetingDay(number, configDict.get("club"));
 
                 System.out.println("STUFF");
