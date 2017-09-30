@@ -51,6 +51,7 @@ public class Firebase {
         this.driver.resetChannel();
         this.driver.setChannel("all_students");
         Reader read = this.driver.read();
+        this.driver.resetChannel();
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
         if (element.toString().equalsIgnoreCase("null")) {

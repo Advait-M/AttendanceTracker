@@ -32,6 +32,7 @@ public class Interface {
     private JTable table1;
     private JLabel edit_number;
     private static HashMap<String, String> configDict = new HashMap<>();
+    private static ArrayList<String> queue = new ArrayList<>();
     private final Firebase fb = new Firebase();
 
     public Interface() {
@@ -156,12 +157,54 @@ public class Interface {
         });
         clearButton.addActionListener(e -> SwingUtilities.invokeLater(() -> textField1.setText(null)));
         table1.getSelectionModel().addListSelectionListener(e -> System.out.println(table1.getValueAt(table1.getSelectedRow(), 0).toString()));
+//        startQueue();
     }
+    private void startQueue() {
+        new Thread (() -> {
+            while (true) {
+                if (queue.size() > 0) {
+                    String number = queue.remove(0);
+                    int ret = fb.addMeetingDay(number, configDict.get("club"));
 
+                    System.out.println("STUFF");
+                    System.out.println(ret);
+                    //            if (!((DefaultListModel) table1.getModel()).contains(number)) {
+                    //                ((DefaultListModel) table1.getModel()).add(0, textField1.getText());
+                    //            }
+                    if (ret == 1) {
+                        JOptionPane.showMessageDialog(null, "Invalid Firebase data or connection to Firebase. Please contact developers.");
+                        throw new java.lang.Error("Terminated program due to invalid connection to Firebase or invalid data in Firebase.");
+                    }
+                    if (ret == 2) {
+                        JOptionPane.showMessageDialog(null, "User is already signed in to " + configDict.get("club") + " today! Cannot sign in again.");
+                    }
+                    if (!checkTableExists(number) && ret != 2) {
+                        DefaultTableModel model = (DefaultTableModel) table1.getModel();
+                        if (configDict.get("paid").equals("true")) {
+                            boolean paid = fb.getPaid(number, configDict.get("club"));
+                            String paidStatus;
+                            if (paid) {
+                                paidStatus = "Paid";
+                            } else {
+                                paidStatus = "Not Paid";
+                            }
+                            model.insertRow(0, new Object[]{number, paidStatus});
+                        } else {
+                            model.insertRow(0, new Object[]{number});
+                        }
+                    }
+                }
+
+            }
+        }).start();
+    }
     private void addStudent() {
         System.out.println(textField1.getText());
         String number = textField1.getText();
         if (isInteger(number)) {
+            System.out.println("HEREE");
+//            queue.add(number);
+
             new Thread (() -> {
                 int ret = fb.addMeetingDay(number, configDict.get("club"));
 
@@ -308,6 +351,7 @@ public class Interface {
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.pack();
                 frame.setVisible(true);
+
             }
         });
 
