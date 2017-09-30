@@ -1,6 +1,5 @@
 import com.alee.laf.WebLookAndFeel;
 import com.sun.xml.internal.ws.util.StringUtils;
-
 import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -15,41 +14,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-//import java.awt.*;
-// Overwrites List object from awt
-
-/**
- * Created by advai on 7/8/2017.
- */
-
 public class Interface {
     private JPanel mainPane;
     private JTextField textField1;
-    //private JList table1;
     private JButton enterButton;
     private JButton clearButton;
     private JTable table1;
-    private JLabel edit_number;
     private static HashMap<String, String> configDict = new HashMap<>();
-    //private static ArrayList<String> queue = new ArrayList<>();
     private static ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
     private final Firebase fb = new Firebase();
 
     public Interface() {
         mainPane.setPreferredSize(new Dimension(800, 800));
         textField1.setPreferredSize(new Dimension(600, 30));
-        // tried to remove cell highlighting - did not work
-//        class MyRenderer extends DefaultTableCellRenderer {
-//
-//            @Override
-//            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-//                super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-//                setBorder(noFocusBorder);
-//                return this;
-//            }
-//
-//        }
-//        table1.setDefaultRenderer(String.class, new MyRenderer());
         table1.setModel(new DefaultTableModel() {
 
             @Override
@@ -58,9 +35,7 @@ public class Interface {
             }
         });
 
-        //table1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         DefaultTableModel model = (DefaultTableModel) table1.getModel();
-        System.out.println(model);
         model.addColumn("Student Number");
 
         if (configDict.get("paid").equals("true")) {
@@ -148,23 +123,18 @@ public class Interface {
 
         });
         clearButton.addActionListener(e -> SwingUtilities.invokeLater(() -> textField1.setText(null)));
-        table1.getSelectionModel().addListSelectionListener(e -> System.out.println(table1.getValueAt(table1.getSelectedRow(), 0).toString()));
+        table1.getSelectionModel().addListSelectionListener(e -> table1.getValueAt(table1.getSelectedRow(), 0));
         startQueue();
     }
     private void startQueue() {
         new Thread (() -> {
             while (true) {
-//                System.out.println("IS EMPTY? "+queue.isEmpty());
+
                 if (!queue.isEmpty()) {
 
                     String number = queue.poll();
                     int ret = fb.addMeetingDay(number, configDict.get("club"));
 
-                    System.out.println("STUFF");
-                    System.out.println(ret);
-                    //            if (!((DefaultListModel) table1.getModel()).contains(number)) {
-                    //                ((DefaultListModel) table1.getModel()).add(0, textField1.getText());
-                    //            }
                     if (ret == 1) {
                         JOptionPane.showMessageDialog(null, "Invalid Firebase data or connection to Firebase. Please contact developers.");
                         throw new Error("Terminated program due to invalid connection to Firebase or invalid data in Firebase.");
@@ -272,18 +242,15 @@ public class Interface {
 
     public static void main(String[] args) {
 
-        String filePath = "config.ser";
-        File f = new File("config.txt");
+//        String filePath = "config.ser";
+//        File f = new File("config.txt");
         try {
             FileInputStream fileIn = new FileInputStream("config.ser");
             ObjectInputStream in = new ObjectInputStream(fileIn);
             configDict = (HashMap<String, String>) in.readObject();
             in.close();
             fileIn.close();
-            System.out.println("HEHREHE");
-            for (String key : configDict.keySet()) {
-                System.out.println(key + ":" + configDict.get(key));
-            }
+
         } catch (IOException | ClassNotFoundException e) {
             String name = JOptionPane.showInputDialog(
                     "What is your club's name?", null);
@@ -322,10 +289,6 @@ public class Interface {
                     e1.printStackTrace();
                 }
 
-                System.out.println("Serialized data is saved in config.ser");
-                for (String key : configDict.keySet()) {
-                    System.out.println(key + ":" + configDict.get(key));
-                }
             } else {
                 throw new Error("User cancelled program.");
             }
@@ -339,10 +302,6 @@ public class Interface {
 
                 JFrame frame = new JFrame(StringUtils.capitalize(configDict.get("club")) + " Attendance");
                 Interface ui = new Interface();
-                //ui.table1.setModel(new DefaultTableModel());
-
-                //model.insertRow(0, new Object[]{"hi2", "Paid"});
-                //System.out.println("ADDED ROW");
                 frame.setContentPane(ui.mainPane);
                 frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
                 frame.pack();
