@@ -171,9 +171,7 @@ public class Driver implements IDriver {
             while ((content = br.readLine()) != null) {
                 sb.append(content);
             }
-            System.out.println("\nSB \"" + sb.toString() + "\"\n");
             if (!sb.toString().equalsIgnoreCase("null")) {
-                System.out.println("==>PASS");
                 return true;
             }
         } catch (Exception e) {
@@ -197,8 +195,6 @@ public class Driver implements IDriver {
             finalLocation += location + "/";
         }
         this.channel = this.channel.toLowerCase() + finalLocation.toLowerCase();
-        System.out.println("CHANNEL");
-        System.out.println(this.channel);
     }
 
     public void resetChannel() {

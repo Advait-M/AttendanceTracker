@@ -59,10 +59,9 @@ public class Firebase {
             for (JsonElement jsonElement : element.getAsJsonArray()) {
                 all_students.add(jsonElement.getAsString());
             }
-            System.out.println("in else");
             this.driver.resetChannel();
             this.driver.setChannel("all_students");
-            System.out.println(this.driver.writeA(all_students.toArray(new String[0])));
+            this.driver.writeA(all_students.toArray(new String[0]));
         }
 
     }
@@ -71,12 +70,8 @@ public class Firebase {
     private ArrayList<String> getAllStudents() {
         this.driver.resetChannel();
         this.driver.setChannel("all_students");
-        System.out.println("Here");
-        System.out.println(this.driver.getChannel());
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(this.driver.read());
-        System.out.println(element.toString());
-        System.out.println(this.driver.getChannel());
         if (!element.toString().equals("null")) {
             ArrayList<String> temp = new ArrayList<>();
             for (JsonElement e : element.getAsJsonArray()) {
@@ -95,11 +90,8 @@ public class Firebase {
         Reader read = this.driver.read();
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
-//        System.out.println("JsonArray Contents");
         if (element.toString().equals("null")) {
             boolean result = createStudent(number, club);
-            System.out.println("HEWRE5");
-            System.out.println(result);
             if (result) {
                 return 0;
             }
@@ -117,12 +109,9 @@ public class Firebase {
         }
 
         JsonElement MaxValue = null; // this will be assigned when the MaxKey is found
-        System.out.println("maxi1");
-        System.out.println(MaxKey);
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
             JsonElement value = entry.getValue();
-//            System.out.println(entry.getKey() + "~>" + entry.getValue());
             data.put(key.toLowerCase(), value.toString().substring(1, value.toString().length() - 1).toLowerCase());
 
             if (key.equals(MaxKey)) {
@@ -132,7 +121,6 @@ public class Firebase {
         }
         String MaxValueString;
         if (MaxValue == null) {
-            System.out.println("RIP");
             return 1;
         }
         MaxValueString = MaxValue.getAsString().split(" ")[0];
@@ -143,8 +131,6 @@ public class Firebase {
             data.put("meeting" + (entries.size() + 1), getDate());
             this.driver.setChannel(number, club);
             boolean result = this.driver.write(data);
-            System.out.println("HEWRE2");
-            System.out.println(result);
             if (result) {
                 return 0;
             }
@@ -213,7 +199,6 @@ public class Firebase {
         for (Map.Entry<String, JsonElement> entry : entries) {
             String key = entry.getKey();
             JsonElement value = entry.getValue();
-            System.out.println(entry.getKey() + "~>" + entry.getValue());
             data.put(key.toLowerCase(), value.toString().substring(1, value.toString().length() - 1).toLowerCase());
         }
         this.driver.setChannel(number, club);
@@ -228,7 +213,6 @@ public class Firebase {
         Firebase firebase = new Firebase();
         firebase.addMeetingDay("641852934", "science");
         firebase.setPaid("641852934", "science");
-        System.out.println("WORKS? "+firebase.getPaid("641852934", "science"));
 
 
         Random r = new Random();
