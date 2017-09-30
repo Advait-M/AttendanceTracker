@@ -51,7 +51,10 @@ public class Firebase {
         this.driver.setChannel("all_students");
         Reader read = this.driver.read();
         this.driver.resetChannel();
+<<<<<<< HEAD
 
+=======
+>>>>>>> refs/remotes/origin/better
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
         if (element.toString().equalsIgnoreCase("null")) {
