@@ -1,23 +1,21 @@
 import com.alee.laf.WebLookAndFeel;
-import com.sun.xml.internal.bind.v2.runtime.output.SAXOutput;
-import sun.security.util.AuthResources_it;
+import com.sun.xml.internal.ws.util.StringUtils;
 
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-//import java.awt.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.*;
 import java.util.ArrayList;
-// Overwrites List object from awt
-import java.util.List;
 import java.util.HashMap;
-import java.util.Objects;
+import java.util.List;
+
+//import java.awt.*;
+// Overwrites List object from awt
 
 /**
  * Created by advai on 7/8/2017.
@@ -79,10 +77,8 @@ public class Interface {
                             if (model.getValueAt(row, 1) == "Not Paid") {
                                 System.out.println("TRIGGERED");
                                 System.out.println((String) model.getValueAt(row, 0));
-                                new Thread (() -> {
-                                    System.out.println(fb.setPaid((String) model.getValueAt(row, 0), configDict.get("club")));
-                                    model.setValueAt("Paid", row, 1);
-                                }).start();
+                                System.out.println(fb.setPaid((String) model.getValueAt(row, 0), configDict.get("club")));
+                                model.setValueAt("Paid", row, 1);
                             }
 //                            JFrame hello = new JFrame("POPUP");
 //                            hello.setSize(100,75);
@@ -130,7 +126,7 @@ public class Interface {
             });
         }
 
-        //Add hacky console debugging interface to confuse user
+
         textField1.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent e) {
@@ -152,7 +148,6 @@ public class Interface {
             addStudent();
 
 
-
         });
         clearButton.addActionListener(e -> SwingUtilities.invokeLater(() -> textField1.setText(null)));
         table1.getSelectionModel().addListSelectionListener(e -> System.out.println(table1.getValueAt(table1.getSelectedRow(), 0).toString()));
@@ -162,7 +157,7 @@ public class Interface {
         System.out.println(textField1.getText());
         String number = textField1.getText();
         if (isInteger(number)) {
-            new Thread (() -> {
+            new Thread(() -> {
                 int ret = fb.addMeetingDay(number, configDict.get("club"));
 
                 System.out.println("STUFF");
@@ -200,6 +195,7 @@ public class Interface {
         }
         clearButton.doClick();
     }
+
     public static boolean isInteger(String str) {
         if (str == null) {
             return false;
@@ -223,14 +219,16 @@ public class Interface {
         }
         return true;
     }
+
     private boolean checkTableExists(String number) {
         DefaultTableModel model = (DefaultTableModel) table1.getModel();
         List<String> numdata = new ArrayList<String>();
-        for (int count = 0; count < model.getRowCount(); count++){
+        for (int count = 0; count < model.getRowCount(); count++) {
             numdata.add(model.getValueAt(count, 0).toString());
         }
         return numdata.contains(number);
     }
+
     public static void main(String[] args) {
 
         String filePath = "config.ser";
@@ -298,7 +296,7 @@ public class Interface {
                 // Install WebL&F as application L&F
                 WebLookAndFeel.install();
 
-                JFrame frame = new JFrame("Interface");
+                JFrame frame = new JFrame(StringUtils.capitalize(configDict.get("club")) + " Attendance");
                 Interface ui = new Interface();
                 //ui.table1.setModel(new DefaultTableModel());
 
@@ -313,8 +311,5 @@ public class Interface {
 
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
 }
 

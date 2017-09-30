@@ -1,6 +1,5 @@
-
-
-import com.google.gson.*;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -8,8 +7,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.text.DateFormat;
-import java.util.*;
 import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 public class Firebase {
@@ -51,6 +50,8 @@ public class Firebase {
         this.driver.resetChannel();
         this.driver.setChannel("all_students");
         Reader read = this.driver.read();
+        this.driver.resetChannel();
+
         JsonParser parser = new JsonParser();
         JsonElement element = parser.parse(read);
         if (element.toString().equalsIgnoreCase("null")) {
