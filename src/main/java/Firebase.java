@@ -237,6 +237,7 @@ public class Firebase {
         for (int i = 0; i < 100; i++) {
             String data = String.valueOf(r.nextInt(900000000) + 100000000);
             String club = clubs[r.nextInt(clubs.length)].replace(" ", "-");
+
             firebase.addMeetingDay(data,club);
             firebase.setPaid(data, club);
 
