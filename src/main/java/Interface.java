@@ -257,7 +257,7 @@ public class Interface {
             if (name == null) {
                 throw new Error("User cancelled program.");
             }
-            configDict.put("club", name);
+            configDict.put("club", name.replaceAll(" ","_"));
             String[] values = {"No", "Yes"};
 
             Object selectedPaid = JOptionPane.showInputDialog(null, "Does your club have a membership fee?", "Selection", JOptionPane.PLAIN_MESSAGE, null, values, "0");
@@ -295,19 +295,17 @@ public class Interface {
         }
 
         // UI work inside Event Dispatch Thread (EDT) since it is best practice
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                // Install WebL&F as application L&F
-                WebLookAndFeel.install();
+        SwingUtilities.invokeLater(() -> {
+            // Install WebL&F as application L&F
+            WebLookAndFeel.install();
 
-                JFrame frame = new JFrame(StringUtils.capitalize(configDict.get("club")) + " Attendance");
-                Interface ui = new Interface();
-                frame.setContentPane(ui.mainPane);
-                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                frame.pack();
-                frame.setVisible(true);
+            JFrame frame = new JFrame(StringUtils.capitalize(configDict.get("club")) + " Attendance");
+            Interface ui = new Interface();
+            frame.setContentPane(ui.mainPane);
+            frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+            frame.pack();
+            frame.setVisible(true);
 
-            }
         });
 
     }
