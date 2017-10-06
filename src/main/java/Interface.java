@@ -1,5 +1,6 @@
 import com.alee.laf.WebLookAndFeel;
 import com.sun.xml.internal.ws.util.StringUtils;
+
 import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
@@ -20,6 +21,8 @@ public class Interface {
     private JButton enterButton;
     private JButton clearButton;
     private JTable table1;
+    private JLabel LastIn;
+    private JLabel TotalIn;
     private static HashMap<String, String> configDict = new HashMap<>();
     private static ConcurrentLinkedQueue<String> queue = new ConcurrentLinkedQueue<>();
     private final Firebase fb = new Firebase();
@@ -104,7 +107,6 @@ public class Interface {
             @Override
             public void insertUpdate(DocumentEvent e) {
                 if (textField1.getText().length() == 9) {
-                    //enterButton.doClick();
                     addStudent();
                 }
             }
@@ -119,15 +121,14 @@ public class Interface {
         });
         enterButton.addActionListener(e -> {
             addStudent();
-
-
         });
         clearButton.addActionListener(e -> SwingUtilities.invokeLater(() -> textField1.setText(null)));
         table1.getSelectionModel().addListSelectionListener(e -> table1.getValueAt(table1.getSelectedRow(), 0));
         startQueue();
     }
+
     private void startQueue() {
-        new Thread (() -> {
+        new Thread(() -> {
             while (true) {
 
                 if (!queue.isEmpty()) {
@@ -143,7 +144,9 @@ public class Interface {
                         JOptionPane.showMessageDialog(null, "User is already signed in to " + configDict.get("club") + " today! Cannot sign in again.");
                     }
                     if (!checkTableExists(number) && ret != 2) {
+                        LastIn.setText("Just Scanned: "+number);
                         DefaultTableModel model = (DefaultTableModel) table1.getModel();
+                        TotalIn.setText("Total: "+(model.getRowCount()+1));
                         if (configDict.get("paid").equals("true")) {
                             boolean paid = fb.getPaid(number, configDict.get("club"));
                             String paidStatus;
@@ -162,6 +165,7 @@ public class Interface {
             }
         }).start();
     }
+
     private void addStudent() {
         System.out.println(textField1.getText());
         String number = textField1.getText();
@@ -257,7 +261,7 @@ public class Interface {
             if (name == null) {
                 throw new Error("User cancelled program.");
             }
-            configDict.put("club", name.replaceAll(" ","_"));
+            configDict.put("club", name.replaceAll(" ", "_"));
             String[] values = {"No", "Yes"};
 
             Object selectedPaid = JOptionPane.showInputDialog(null, "Does your club have a membership fee?", "Selection", JOptionPane.PLAIN_MESSAGE, null, values, "0");
