@@ -1,9 +1,12 @@
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpDelete;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.methods.HttpPatch;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.client.HttpClients;
 
 import java.io.*;
 import java.net.URL;
@@ -17,32 +20,6 @@ public class Driver implements IDriver {
     private String key = "";
     private final static String QUATA = "\""; // Escaped Quotation Mark
 
-    public boolean writeA(String[] all_data) {
-        try {
-            StringBuffer sb = new StringBuffer();
-            sb.append("[");
-            for (String i : all_data) {
-                sb.append(QUATA+i+QUATA+",");
-            }
-
-            String data = sb.toString();
-            data = data.substring(0, data.length() - 1);
-            String node = data + "]";
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPut httppost = new HttpPut(getChannelUrl()); // Use PUT prevents key generation for each as a parent
-            StringEntity entity = new StringEntity(node);
-            httppost.setEntity(entity);
-            httppost.setHeader("Accept", "application/json");
-            httppost.setHeader("Content-type", "application/json");
-            HttpResponse response = httpclient.execute(httppost);
-            this.resetChannel();
-            return response.getStatusLine().getStatusCode() == 200;
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
-    }
-
 
     public boolean writeA(String key,String[] all_data) {
         try {
@@ -55,7 +32,7 @@ public class Driver implements IDriver {
             String data = sb.toString();
             data = data.substring(0, data.length() - 1);
             String node = data + "]}";
-            HttpClient httpclient = new DefaultHttpClient();
+            HttpClient httpclient = HttpClients.createDefault();
             HttpPut httppost = new HttpPut(getChannelUrl()); // Use PUT prevents key generation for each as a parent
             StringEntity entity = new StringEntity(node);
             httppost.setEntity(entity);
@@ -69,7 +46,8 @@ public class Driver implements IDriver {
             return false;
         }
     }
-    public boolean write(Map<String, String> map) {
+
+    public boolean writeV2(Map<String, String> map) {
         try {
             StringBuffer sb = new StringBuffer();
             sb.append("{");
@@ -86,8 +64,8 @@ public class Driver implements IDriver {
             String data = sb.toString();
             data = data.substring(0, data.length() - 1);
             String node = data + "}";
-            HttpClient httpclient = new DefaultHttpClient();
-            HttpPut httppost = new HttpPut(getChannelUrl()); // Use PUT prevents key generation for each as a parent
+            HttpClient httpclient = HttpClients.createDefault();
+            HttpPatch httppost = new HttpPatch(getChannelUrl()); // Use PATCH updates things
             StringEntity entity = new StringEntity(node);
             httppost.setEntity(entity);
             httppost.setHeader("Accept", "application/json");
@@ -198,8 +176,7 @@ public class Driver implements IDriver {
     }
 
     public void resetChannel() {
-        String defaultChannel = "https://clubattendancesjam.firebaseio.com/";
-        this.channel = defaultChannel;
+        this.channel = "https://clubattendancesjam.firebaseio.com/";
     }
 
     public String getKey() {
